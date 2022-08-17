@@ -9,8 +9,11 @@ import (
 
 func main() {
 	cd := cobra.Command{}
-	cd.AddCommand(cmd.RunCmd)
-	cd.AddCommand(cmd.InfoCmd)
+	cd.AddCommand(
+		cmd.VersionCmd,
+		cmd.RunCmd,
+		cmd.InfoCmd,
+	)
 	if err := cd.Execute(); err != nil {
 		fmt.Println("run:", err)
 	}
