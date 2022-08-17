@@ -32,6 +32,8 @@ var RunCmd = &cobra.Command{
 				fmt.Println("run code: ", err)
 				return
 			}
+			fmt.Println("id:", id.InterpretId)
+
 			fetchResult, err := run.FetchRunResult(id.InterpretId)
 			if err != nil {
 				fmt.Println("fetch result: ", err)
@@ -44,6 +46,8 @@ var RunCmd = &cobra.Command{
 				fmt.Println("submit code: ", err)
 				return
 			}
+			fmt.Println("id:", id.SubmissionId)
+
 			fetchResult, err := run.FetchSubmissionResult(id.SubmissionId)
 			if err != nil {
 				fmt.Println("fetch result: ", err)
@@ -63,4 +67,5 @@ var RunCmd = &cobra.Command{
 
 func prepareRunFlags() {
 	RunCmd.Flags().StringP("kind", "k", "run", "set kind run or submit")
+	RunCmd.Flags().StringP("input", "i", "", "set input prefix")
 }
