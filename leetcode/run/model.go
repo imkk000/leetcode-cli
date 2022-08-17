@@ -53,7 +53,7 @@ type ResponseFetchRunResultBody struct {
 	RunSuccess             bool          `json:"run_success"`
 	StatusRuntime          string        `json:"status_runtime"`
 	Memory                 int           `json:"memory"`
-	CodeAnswer             []string      `json:"code_answer"`
+	CodeAnswer             interface{}   `json:"code_answer"`
 	CodeOutput             []interface{} `json:"code_output"`
 	StdOutput              []string      `json:"std_output"`
 	ElapsedTime            int           `json:"elapsed_time"`
