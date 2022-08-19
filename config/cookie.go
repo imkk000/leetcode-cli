@@ -7,11 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-func ReadCookies() url.Values {
+func ReadCookies(configDir string) url.Values {
 	cookies := url.Values{}
 
 	vp := viper.New()
-	vp.AddConfigPath(".data/config")
+	vp.AddConfigPath(configDir)
 	vp.SetConfigType("json")
 	vp.SetConfigName("cookies")
 	if err := vp.ReadInConfig(); err != nil {
