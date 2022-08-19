@@ -11,101 +11,94 @@ import (
 	"time"
 )
 
-func RunCode(c *code.Code) (*ResponseRunResultBody, error) {
+const (
+	FetchResultStateSuccess = "\"SUCCESS\""
+	FetchResultRetryLimit   = 150
+)
+
+func RunCode(c *code.Code) (string, error) {
 	path := fmt.Sprintf("problems/%s/interpret_solution/", c.Title)
 	body, err := json.Marshal(c)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	resp, err := client.Post(path, bytes.NewReader(body))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	var respBody ResponseRunResultBody
-	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
-		return nil, err
+	var respBody struct {
+		InterpretId string `json:"interpret_id"`
 	}
-	return &respBody, nil
+	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
+		return "", err
+	}
+	return respBody.InterpretId, nil
 }
 
-func SubmitCode(c *code.Code) (*ResponseSubmissionResultBody, error) {
+func SubmitCode(c *code.Code) (string, error) {
 	path := fmt.Sprintf("/problems/%s/submit/", c.Title)
-	reqBody := RequestSubmissionBody{
+	reqBody := struct {
+		QuestionId string `json:"question_id"`
+		Lang       string `json:"lang"`
+		TypedCode  string `json:"typed_code"`
+	}{
 		QuestionId: c.Id,
 		Lang:       c.Language,
 		TypedCode:  c.Src,
 	}
 	body, err := json.Marshal(reqBody)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	resp, err := client.Post(path, bytes.NewReader(body))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	var respBody ResponseSubmissionResultBody
+	var respBody struct {
+		SubmissionId int64 `json:"submission_id"`
+	}
 	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
-		return nil, err
+		return "", err
 	}
-	return &respBody, nil
+	return strconv.FormatInt(respBody.SubmissionId, 10), nil
 }
 
-func FetchSubmissionResult(id int64) (*ResponseFetchSubmissionBody, error) {
-	submissionId := strconv.FormatInt(id, 10)
-	status := new(ResponseFetchSubmissionBody)
-	if err := fetchResult(submissionId, status); err != nil {
-		return nil, err
-	}
-	return status, nil
-}
-
-func FetchRunResult(id string) (*ResponseFetchRunResultBody, error) {
-	status := new(ResponseFetchRunResultBody)
-	if err := fetchResult(id, status); err != nil {
-		return nil, err
-	}
-	return status, nil
-}
-
-func fetchResult(id string, v any) error {
+func FetchRunResult(id string) (map[string]json.RawMessage, error) {
 	t := time.NewTicker(250 * time.Millisecond)
 	defer t.Stop()
 
 	path := fmt.Sprintf("submissions/detail/%s/check/", id)
 	var count int
+	var v map[string]json.RawMessage
 	for range t.C {
 		count++
 
-		switch v.(type) {
-		case *ResponseFetchRunResultBody:
-			status := v.(*ResponseFetchRunResultBody)
-			if status.State == FetchResultStateSuccess {
-				return nil
-			}
-		case *ResponseFetchSubmissionBody:
-			status := v.(*ResponseFetchSubmissionBody)
-			if status.State == FetchResultStateSuccess {
-				return nil
-			}
-		}
 		if count >= FetchResultRetryLimit {
-			return errors.New("reach maximum retry limit")
+			return nil, errors.New("reach maximum retry limit")
 		}
 
 		resp, err := client.Get(path)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
-			return err
+		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+			return nil, err
 		}
 		if err := resp.Body.Close(); err != nil {
-			return err
+			return nil, err
+		}
+
+		state, ok := v["state"]
+		if !ok {
+			return nil, errors.New("state not found in response")
+		}
+		if string(state) == FetchResultStateSuccess {
+			break
 		}
 	}
-	return nil
+	return v, nil
 }
