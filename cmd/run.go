@@ -21,47 +21,36 @@ var RunCmd = &cobra.Command{
 		}
 		kind, err := cmd.Flags().GetString("kind")
 		if err != nil {
-			fmt.Println("get kind: ", err)
+			fmt.Println("get kind:", err)
 			return
 		}
-		var result any
+		var subId string
 		switch kind {
 		case "run":
-			id, err := run.RunCode(c)
+			subId, err = run.RunCode(c)
 			if err != nil {
-				fmt.Println("run code: ", err)
+				fmt.Println("run code:", err)
 				return
 			}
-			fmt.Println("id:", id.InterpretId)
-
-			fetchResult, err := run.FetchRunResult(id.InterpretId)
-			if err != nil {
-				fmt.Println("fetch result: ", err)
-				return
-			}
-			result = fetchResult
 		case "submit":
-			id, err := run.SubmitCode(c)
+			subId, err = run.SubmitCode(c)
 			if err != nil {
-				fmt.Println("submit code: ", err)
+				fmt.Println("submit code:", err)
 				return
 			}
-			fmt.Println("id:", id.SubmissionId)
-
-			fetchResult, err := run.FetchSubmissionResult(id.SubmissionId)
-			if err != nil {
-				fmt.Println("fetch result: ", err)
-				return
-			}
-			result = fetchResult
 		}
 
-		data, err := json.MarshalIndent(result, "", "  ")
+		result, err := run.FetchRunResult(subId)
 		if err != nil {
-			fmt.Println("json marshal: ", err)
+			fmt.Println("fetch result:", err)
 			return
 		}
-		fmt.Printf("resut: %s\n", data)
+		data, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println("json marshal:", err)
+			return
+		}
+		fmt.Println(string(data))
 	},
 }
 

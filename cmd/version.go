@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"crypto/sha256"
+	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"leetcode-tool/config"
 	"os"
 	"runtime"
 
@@ -15,6 +16,7 @@ var VersionCmd = &cobra.Command{
 	Short: "get version",
 	Args:  cobra.NoArgs,
 	Run: func(_ *cobra.Command, args []string) {
+		fmt.Printf("version: %s\n", config.Version)
 		fmt.Printf("build: %s %s/%s\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
 		appPath, err := os.Executable()
@@ -29,7 +31,7 @@ var VersionCmd = &cobra.Command{
 			fmt.Println("read file:", err)
 			return
 		}
-		hash := sha256.Sum256(data)
+		hash := sha1.Sum(data)
 		fmt.Printf("checksum: %s\n", hex.EncodeToString(hash[:]))
 	},
 }

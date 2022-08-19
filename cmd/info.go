@@ -13,17 +13,16 @@ var InfoCmd = &cobra.Command{
 	Short: "inquire problem",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		result, err := info.Get(args[0])
+		result, err := info.GetProblemDetail(args[0])
 		if err != nil {
-			fmt.Println("inquire: ", err)
+			fmt.Println("inquire:", err)
 			return
 		}
-
-		data, err := json.MarshalIndent(result, "", "  ")
+		data, err := json.Marshal(result)
 		if err != nil {
-			fmt.Println("json marshal: ", err)
+			fmt.Println("json marshal:", err)
 			return
 		}
-		fmt.Printf("result: %s\n", data)
+		fmt.Println(string(data))
 	},
 }
