@@ -16,8 +16,8 @@ type Code struct {
 	Title       string   `json:"-" yaml:"title"`
 	Language    string   `json:"lang" yaml:"lang"`
 	Type        string   `json:"judge_type" yaml:"type"`
-	Input       []string `json:"-" yaml:"input"`
-	InputString string   `json:"-" yaml:"inputString"`
+	Input       []string `json:"-" yaml:"input,omitempty"`
+	InputString string   `json:"-" yaml:"inputString,omitempty"`
 	RawInput    string   `json:"data_input" yaml:"-"`
 	Src         string   `json:"typed_code" yaml:"-"`
 }
@@ -97,13 +97,18 @@ func readDecls(decls []ast.Decl) ([]ast.Decl, error) {
 			}
 		case *ast.FuncDecl:
 			g := d.(*ast.FuncDecl)
-			if isExclude(g.Doc.Text()) {
+			if isExclude(g.Doc.Text()) || isTest(g.Name.String()) {
 				continue
 			}
 		}
 		decls = append(decls, d)
 	}
 	return decls[l:], nil
+}
+
+func isTest(s string) bool {
+	return strings.HasPrefix(s, "Test") ||
+		strings.HasPrefix(s, "Benchmark")
 }
 
 func isImport(s string) bool {
