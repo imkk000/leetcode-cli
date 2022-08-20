@@ -11,7 +11,7 @@ import (
 
 var RunCmd = &cobra.Command{
 	Use:   "run",
-	Short: "run and submit problem",
+	Short: "Run and submit problem",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		c, err := code.ParseFilename(args[0])
@@ -56,5 +56,4 @@ var RunCmd = &cobra.Command{
 
 func prepareRunFlags() {
 	RunCmd.Flags().StringP("kind", "k", "run", "set kind run or submit")
-	RunCmd.Flags().StringP("input", "i", "", "set input prefix")
 }

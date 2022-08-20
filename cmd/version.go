@@ -13,7 +13,7 @@ import (
 
 var VersionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "get version",
+	Short: "Get application version",
 	Args:  cobra.NoArgs,
 	Run: func(_ *cobra.Command, args []string) {
 		fmt.Printf("version: %s\n", config.Version)

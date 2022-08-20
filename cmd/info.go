@@ -10,7 +10,7 @@ import (
 
 var InfoCmd = &cobra.Command{
 	Use:   "info",
-	Short: "inquire problem",
+	Short: "Get information",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
 		result, err := info.GetProblemDetail(args[0])
