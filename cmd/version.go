@@ -17,10 +17,6 @@ var VersionCmd = &cobra.Command{
 	Short: "Get application version",
 	Args:  cobra.NoArgs,
 	Run: func(_ *cobra.Command, args []string) {
-		if config.IsDebugMode() {
-			info, _ := debug.ReadBuildInfo()
-			fmt.Println(info.String())
-		}
 		fmt.Printf("version: %s (%s)\n", config.Version, config.GetMode())
 		fmt.Printf("build: %s %s/%s\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 
@@ -38,5 +34,10 @@ var VersionCmd = &cobra.Command{
 		}
 		hash := sha1.Sum(data)
 		fmt.Printf("checksum: %s\n", hex.EncodeToString(hash[:]))
+
+		if config.IsDebugMode() {
+			info, _ := debug.ReadBuildInfo()
+			fmt.Println(info.String())
+		}
 	},
 }
