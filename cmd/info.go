@@ -13,10 +13,15 @@ var InfoCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Get information",
 	Args:  cobra.MinimumNArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		switch getType(args[0]) {
 		case GetTypeInfo:
-			result, err := info.GetProblemDetail(strparser.ParseUrl(args[1]))
+			m, err := cmd.Flags().GetBool("metadata")
+			if err != nil {
+				fmt.Println("get metadata:", err)
+				return
+			}
+			result, err := info.GetProblemDetail(strparser.ParseUrl(args[1]), m)
 			if err != nil {
 				fmt.Println("inquire:", err)
 				return
@@ -60,4 +65,8 @@ func getType(t string) GetType {
 		return GetTypeSubmission
 	}
 	return GetType(0)
+}
+
+func prepareGetFlags() {
+	InfoCmd.Flags().BoolP("metadata", "m", false, "show minimum required fields for metadata")
 }
