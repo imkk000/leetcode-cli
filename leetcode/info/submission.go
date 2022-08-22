@@ -10,18 +10,19 @@ import (
 	"rogchap.com/v8go"
 )
 
-func GetSubmission(id string) error {
+func GetSubmission(id string) (map[string]json.RawMessage, error) {
 	path := fmt.Sprintf("/submissions/detail/%s/", id)
 	resp, err := client.Get(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	var result map[string]json.RawMessage
 	doc.Find("script").Each(func(_ int, s *goquery.Selection) {
 		if !strings.Contains(s.Text(), "submissionData") {
 			return
@@ -42,15 +43,9 @@ func GetSubmission(id string) error {
 			return
 		}
 
-		var sub map[string]json.RawMessage
-		if err := json.Unmarshal(data, &sub); err != nil {
+		if err := json.Unmarshal(data, &result); err != nil {
 			return
 		}
-		data, err = json.MarshalIndent(sub, "", "  ")
-		if err != nil {
-			return
-		}
-		fmt.Println(string(data))
 	})
-	return nil
+	return result, nil
 }
