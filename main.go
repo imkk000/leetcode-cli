@@ -13,10 +13,7 @@ func main() {
 
 	// implementing command
 	if config.IsDebugMode() {
-		cd.AddCommand(
-			cmd.GenerateFileCmd,
-			cmd.TestCmd,
-		)
+		cd.AddCommand()
 	}
 
 	// publish command
@@ -26,6 +23,7 @@ func main() {
 		cmd.InfoCmd,
 		cmd.ParseFileCmd,
 		cmd.TestNetCmd,
+		cmd.GenerateFileCmd,
 	)
 
 	if err := cd.Execute(); err != nil {
