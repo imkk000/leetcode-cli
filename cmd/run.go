@@ -21,7 +21,7 @@ var RunCmd = &cobra.Command{
 		}
 		kind, err := cmd.Flags().GetString("type")
 		if err != nil {
-			fmt.Println("get kind:", err)
+			fmt.Println("get type:", err)
 			return
 		}
 		var subId string
