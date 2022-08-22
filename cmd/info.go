@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"leetcode-tool/leetcode/info"
+	"leetcode-tool/leetcode/strparser"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +14,7 @@ var InfoCmd = &cobra.Command{
 	Short: "Get information",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		result, err := info.GetProblemDetail(args[0])
+		result, err := info.GetProblemDetail(strparser.ParseUrl(args[0]))
 		if err != nil {
 			fmt.Println("inquire:", err)
 			return

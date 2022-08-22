@@ -19,7 +19,7 @@ var RunCmd = &cobra.Command{
 			fmt.Printf("parse %s: %v\n", args[0], err)
 			return
 		}
-		kind, err := cmd.Flags().GetString("kind")
+		kind, err := cmd.Flags().GetString("type")
 		if err != nil {
 			fmt.Println("get kind:", err)
 			return
@@ -55,5 +55,5 @@ var RunCmd = &cobra.Command{
 }
 
 func prepareRunFlags() {
-	RunCmd.Flags().StringP("kind", "k", "run", "set kind run or submit")
+	RunCmd.Flags().StringP("type", "t", "run", "choose running type (run or submit)")
 }
