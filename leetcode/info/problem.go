@@ -6,11 +6,15 @@ import (
 	"leetcode-tool/client/graphql"
 )
 
-func GetProblemDetail(titleSlug string) (map[string]json.RawMessage, error) {
+func GetProblemDetail(titleSlug string, metadataQuery bool) (map[string]json.RawMessage, error) {
 	variables := graphql.V{
 		"titleSlug": titleSlug,
 	}
-	reqBody, err := graphql.CreateRequest(Query, variables)
+	query := Query
+	if metadataQuery {
+		query = QueryMetadata
+	}
+	reqBody, err := graphql.CreateRequest(query, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +28,26 @@ func GetProblemDetail(titleSlug string) (map[string]json.RawMessage, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
+	if _, exists := result["data"]; !exists {
+		return result, nil
+	}
 	return result, nil
 }
+
+const QueryMetadata = `
+query questionData($titleSlug: String!) {
+  question(titleSlug: $titleSlug) {
+    questionId
+    titleSlug
+    judgeType
+    exampleTestcases
+    codeSnippets {
+      langSlug
+      code
+    }
+  }
+}
+`
 
 const Query = `
 query questionData($titleSlug: String!) {
