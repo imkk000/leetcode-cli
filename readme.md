@@ -8,8 +8,10 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
+  genfile     Generate Test File
+  get         Get information
   help        Help about any command
-  info        Get information
+  parse       Parse code
   run         Run and submit problem
   testnet     Test send HEAD to server
   version     Get application version
